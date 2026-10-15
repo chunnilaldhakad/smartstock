@@ -1,7 +1,7 @@
 import { Download, Printer } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Badge, Button, Panel, Select, Stat, TabPanel, Tabs } from '@/components/ui';
+import { Badge, Button, Panel, Select, Stat, TabPanel, Tabs, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { collections, periodSales, rescueStats } from '@/data/derived';
 import { useAppData } from '@/data/store';
@@ -106,13 +106,14 @@ export default function Reports() {
           </>
         }
       />
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Panel className="p-4"><Stat label="Net sales (incl. GST)" value={money0(sales.total)} /></Panel>
-        <Panel className="p-4"><Stat label="Collected" value={money0(col.cash + col.upi + col.card + col.bank)} /></Panel>
-        <Panel className="p-4"><Stat label="Purchases" value={money0(purchases.reduce((a, p) => a + p.total, 0))} /></Panel>
-        <Panel className="p-4"><Stat label="Estimated gross profit" value={money0(sales.profit)} /></Panel>
-      </div>
-      <Panel className="p-2 sm:p-4">
+      <Stagger staggerMs={40} className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StaggerItem index={0}><Panel className="p-4"><Stat label="Net sales (incl. GST)" value={money0(sales.total)} /></Panel></StaggerItem>
+        <StaggerItem index={1}><Panel className="p-4"><Stat label="Collected" value={money0(col.cash + col.upi + col.card + col.bank)} /></Panel></StaggerItem>
+        <StaggerItem index={2}><Panel className="p-4"><Stat label="Purchases" value={money0(purchases.reduce((a, p) => a + p.total, 0))} /></Panel></StaggerItem>
+        <StaggerItem index={3}><Panel className="p-4"><Stat label="Estimated gross profit" value={money0(sales.profit)} /></Panel></StaggerItem>
+      </Stagger>
+      <ScrollReveal>
+        <Panel className="p-2 sm:p-4">
         <Tabs value={tab} onValueChange={setTab} tabs={[{ value: 'overview', label: 'Overview' }, { value: 'stock', label: 'Stock reconciliation' }, { value: 'registers', label: 'Registers' }, { value: 'tax', label: 'Tax summary' }]}>
           <TabPanel value="overview">
             <div className="flex justify-end px-2"><Button size="sm" onClick={() => downloadCSV(`monthly-overview-${month}.csv`, ['Measure', 'Value'], overview.map(([l, v]) => [l, v.toFixed(2)]), meta)}><Download size={14} />CSV</Button></div>
@@ -179,7 +180,8 @@ export default function Reports() {
             <p className="mt-1 px-2 text-xs text-ink-3">Totals reconcile with the stored tax on each invoice line. This summary supports return preparation; it is not a GST filing and does not verify GSTINs. Have rates and treatment reviewed by your CA.</p>
           </TabPanel>
         </Tabs>
-      </Panel>
+        </Panel>
+      </ScrollReveal>
     </div>
   );
 }

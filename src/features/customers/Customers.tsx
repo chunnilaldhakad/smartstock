@@ -1,7 +1,7 @@
 import { Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, Input, Panel, Stat } from '@/components/ui';
+import { Badge, Button, Input, Panel, Stat, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { customerDues } from '@/data/derived';
 import { useAppData } from '@/data/store';
@@ -26,13 +26,14 @@ export default function Customers() {
   return (
     <div>
       <PageHeader eyebrow="Customers" title="Customers & dues" sub="Credit (khata) balances come from unpaid invoices. Repayments reduce dues — they are never counted as new sales." actions={<Button variant="primary" onClick={() => setAdd(true)}><Plus size={15} />Add customer</Button>} />
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Panel className="p-4"><Stat label="Customers" value={s.customers.length} /></Panel>
-        <Panel className="p-4"><Stat label="Outstanding dues" value={money0(outstanding)} /></Panel>
-        <Panel className="p-4"><Stat label="Customers with dues" value={dues.filter((d) => d.due > 0).length} /></Panel>
-        <Panel className="p-4"><Stat label="Overdue" value={dues.filter((d) => d.due > 0 && d.overdueDays > 0).length} /></Panel>
-      </div>
-      <Panel className="p-3 sm:p-4">
+      <Stagger staggerMs={40} className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StaggerItem index={0}><Panel className="p-4"><Stat label="Customers" value={s.customers.length} /></Panel></StaggerItem>
+        <StaggerItem index={1}><Panel className="p-4"><Stat label="Outstanding dues" value={money0(outstanding)} /></Panel></StaggerItem>
+        <StaggerItem index={2}><Panel className="p-4"><Stat label="Customers with dues" value={dues.filter((d) => d.due > 0).length} /></Panel></StaggerItem>
+        <StaggerItem index={3}><Panel className="p-4"><Stat label="Overdue" value={dues.filter((d) => d.due > 0 && d.overdueDays > 0).length} /></Panel></StaggerItem>
+      </Stagger>
+      <ScrollReveal>
+        <Panel className="p-3 sm:p-4">
         <div className="relative mb-3 max-w-md">
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name or phone" className="pl-9" aria-label="Search customers" />
@@ -54,7 +55,8 @@ export default function Customers() {
             </tbody>
           </table>
         </div>
-      </Panel>
+        </Panel>
+      </ScrollReveal>
       <NewCustomerDialog open={add} onOpenChange={setAdd} onCreated={(id) => navigate(`/customers/${id}`)} />
     </div>
   );

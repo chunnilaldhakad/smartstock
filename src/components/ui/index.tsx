@@ -14,11 +14,11 @@ type Variant = 'primary' | 'glass' | 'ghost' | 'danger' | 'dark';
 type Size = 'sm' | 'md' | 'lg' | 'icon';
 const variants: Record<Variant, string> = {
   primary:
-    'bg-brand text-ink shadow-[0_8px_20px_-8px_rgba(255,138,0,.65),inset_0_1px_0_rgba(255,255,255,.35)] hover:bg-brand-strong hover:-translate-y-px active:translate-y-0',
-  glass: 'glass text-ink hover:bg-white/80 hover:-translate-y-px active:translate-y-0',
-  ghost: 'text-ink-2 hover:text-ink hover:bg-white/60',
-  danger: 'bg-bad text-white hover:brightness-110',
-  dark: 'bg-ink text-white hover:bg-black shadow-[0_8px_20px_-10px_rgba(0,0,0,.5)]',
+    'bg-brand text-ink shadow-[0_8px_20px_-8px_rgba(255,138,0,.65),inset_0_1px_0_rgba(255,255,255,.35)] hover:bg-brand-strong hover:-translate-y-px active:translate-y-0 active:scale-[0.98]',
+  glass: 'glass text-ink hover:bg-white/80 hover:-translate-y-px active:translate-y-0 active:scale-[0.98]',
+  ghost: 'text-ink-2 hover:text-ink hover:bg-white/60 active:scale-[0.98]',
+  danger: 'bg-bad text-white hover:brightness-110 active:scale-[0.98]',
+  dark: 'bg-ink text-white hover:bg-black shadow-[0_8px_20px_-10px_rgba(0,0,0,.5)] active:scale-[0.98]',
 };
 const sizes: Record<Size, string> = {
   sm: 'h-8 px-3 text-xs rounded-[12px] gap-1.5',
@@ -63,9 +63,22 @@ export function ButtonLink({ variant = 'glass', size = 'md', className, ...rest 
 }
 
 // ───────────── Panel ─────────────
-export function Panel({ className, children, read, as: As = 'section', ...rest }: { className?: string; children: ReactNode; read?: boolean; as?: 'section' | 'div' | 'article' } & React.HTMLAttributes<HTMLElement>) {
+export function Panel({
+  className,
+  children,
+  read,
+  interactive,
+  as: As = 'section',
+  ...rest
+}: {
+  className?: string;
+  children: ReactNode;
+  read?: boolean;
+  interactive?: boolean;
+  as?: 'section' | 'div' | 'article';
+} & React.HTMLAttributes<HTMLElement>) {
   return (
-    <As className={cn(read ? 'panel-read' : 'panel', 'p-5 sm:p-6', className)} {...rest}>
+    <As className={cn(read ? 'panel-read' : 'panel', interactive && 'interactive-lift cursor-pointer', 'p-5 sm:p-6', className)} {...rest}>
       {children}
     </As>
   );
@@ -267,3 +280,17 @@ export function DemoTag({ className }: { className?: string }) {
     </span>
   );
 }
+
+export {
+  useReducedMotion,
+  ScrollReveal,
+  Stagger,
+  StaggerItem,
+  PageTransition,
+} from './motion';
+export type {
+  ScrollRevealProps,
+  StaggerProps,
+  StaggerItemProps,
+} from './motion';
+

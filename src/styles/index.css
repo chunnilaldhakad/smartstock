@@ -40,6 +40,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
 body {
   @apply bg-canvas font-sans text-ink antialiased;
@@ -232,6 +233,100 @@ body {
 }
 .animate-rise {
   animation: rise 0.42s var(--ease) both;
+}
+
+/* Page enter transition */
+@keyframes page-enter {
+  from {
+    opacity: 0.88;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-page-enter {
+  animation: page-enter 0.26s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+/* Scroll reveal variations */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-reveal-up {
+  animation: reveal-up 0.42s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-reveal-fade {
+  animation: reveal-fade 0.35s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-reveal-scale {
+  animation: reveal-scale 0.4s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+/* Subtle continuous pulse for active badges / live indicators */
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Stagger item helper */
+.stagger-item {
+  animation: reveal-up 0.42s var(--ease) both;
+  animation-delay: calc(var(--stagger-idx, 0) * 45ms);
+}
+
+/* Interactive microinteractions */
+.interactive-lift {
+  transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease);
+}
+.interactive-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+.interactive-lift:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.tap-feedback {
+  transition: transform 0.12s var(--ease);
+}
+.tap-feedback:active {
+  transform: scale(0.97);
 }
 @keyframes shimmer {
   0% {

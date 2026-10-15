@@ -355,7 +355,7 @@ export default function POS() {
           {/* payment */}
           <div role="radiogroup" aria-label="Payment method" className="mt-4 grid grid-cols-5 gap-1 rounded-[14px] bg-ink/[.05] p-1">
             {MODES.map((m) => (
-              <button key={m.value} role="radio" aria-checked={mode === m.value} onClick={() => setMode(m.value)} className={cn('focus-ring flex flex-col items-center gap-0.5 rounded-[11px] py-1.5 text-[11px] font-medium transition', mode === m.value ? 'bg-white text-ink shadow-[0_2px_8px_-2px_rgba(0,0,0,.15)]' : 'text-ink-2 hover:text-ink')}>
+              <button key={m.value} role="radio" aria-checked={mode === m.value} onClick={() => setMode(m.value)} className={cn('focus-ring tap-feedback flex flex-col items-center gap-0.5 rounded-[11px] py-1.5 text-[11px] font-medium transition active:scale-95', mode === m.value ? 'bg-white text-ink shadow-[0_2px_8px_-2px_rgba(0,0,0,.15)]' : 'text-ink-2 hover:text-ink')}>
                 {m.icon}
                 {m.label}
               </button>
@@ -441,7 +441,7 @@ export default function POS() {
                   key={v.product.id}
                   onClick={() => add(v)}
                   disabled={avail <= 0}
-                  className="focus-ring group relative flex flex-col items-center rounded-[18px] bg-white/55 p-3 text-center ring-1 ring-black/[.03] transition hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-glass disabled:opacity-45"
+                  className="focus-ring tap-feedback group relative flex flex-col items-center rounded-[18px] bg-white/55 p-3 text-center ring-1 ring-black/[.03] transition hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-glass active:scale-95 disabled:opacity-45"
                   aria-label={`Add ${v.product.name}, ${money(v.product.price)}`}
                 >
                   {rescue && <Badge tone="brand" className="absolute left-2 top-2 px-1.5 text-[10px]">Rescue price</Badge>}

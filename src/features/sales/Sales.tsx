@@ -1,7 +1,7 @@
 import { Download, Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, ButtonLink, Button, Input, Panel, Select, Stat } from '@/components/ui';
+import { Badge, ButtonLink, Button, Input, Panel, Select, Stat, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { useAppData } from '@/data/store';
 import { downloadCSV } from '@/lib/csv';
@@ -40,13 +40,14 @@ export default function Sales() {
           </>
         }
       />
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Panel className="p-4"><Stat label="Invoices (posted)" value={posted.length} /></Panel>
-        <Panel className="p-4"><Stat label="Sales incl. GST" value={money0(posted.reduce((a, i) => a + i.total, 0))} /></Panel>
-        <Panel className="p-4"><Stat label="GST collected" value={money0(posted.reduce((a, i) => a + i.tax, 0))} /></Panel>
-        <Panel className="p-4"><Stat label="Still due (credit)" value={money0(posted.reduce((a, i) => a + i.due, 0))} /></Panel>
-      </div>
-      <Panel className="p-3 sm:p-4">
+      <Stagger staggerMs={40} className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StaggerItem index={0}><Panel className="p-4"><Stat label="Invoices (posted)" value={posted.length} /></Panel></StaggerItem>
+        <StaggerItem index={1}><Panel className="p-4"><Stat label="Sales incl. GST" value={money0(posted.reduce((a, i) => a + i.total, 0))} /></Panel></StaggerItem>
+        <StaggerItem index={2}><Panel className="p-4"><Stat label="GST collected" value={money0(posted.reduce((a, i) => a + i.tax, 0))} /></Panel></StaggerItem>
+        <StaggerItem index={3}><Panel className="p-4"><Stat label="Still due (credit)" value={money0(posted.reduce((a, i) => a + i.due, 0))} /></Panel></StaggerItem>
+      </Stagger>
+      <ScrollReveal>
+        <Panel className="p-3 sm:p-4">
         <div className="mb-3 flex flex-wrap gap-2">
           <div className="relative min-w-[220px] flex-1">
             <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
@@ -80,7 +81,8 @@ export default function Sales() {
           <span>{rows.length} invoices</span>
           {limit < rows.length && <Button size="sm" onClick={() => setLimit((l) => l + 50)}>Load more</Button>}
         </div>
-      </Panel>
+        </Panel>
+      </ScrollReveal>
     </div>
   );
 }

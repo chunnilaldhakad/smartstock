@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ProductThumb } from '@/components/brand/ProductVisual';
 import { LineChart, ShareBars } from '@/components/charts';
-import { Button, Panel, PanelHeader, Select, Stat } from '@/components/ui';
+import { Button, Panel, PanelHeader, Select, Stat, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { dailySeries, netPrice, periodSales } from '@/data/derived';
 import { useAppData } from '@/data/store';
@@ -65,13 +65,15 @@ export default function Profit() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        {[['Revenue (excl. GST)', money0(p.revenue)], ['Cost of goods sold', money0(p.cost)], ['Gross profit', money0(p.profit)], ['Gross margin', pct(p.margin)], ['Units sold', qty(rows.reduce((a, x) => a + x.units, 0))]].map(([l, v]) => (
-          <Panel key={l} className="p-4"><Stat label={l} value={v} /></Panel>
+      <Stagger staggerMs={40} className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        {[['Revenue (excl. GST)', money0(p.revenue)], ['Cost of goods sold', money0(p.cost)], ['Gross profit', money0(p.profit)], ['Gross margin', pct(p.margin)], ['Units sold', qty(rows.reduce((a, x) => a + x.units, 0))]].map(([l, v], idx) => (
+          <StaggerItem key={l} index={idx}>
+            <Panel className="p-4"><Stat label={l} value={v} /></Panel>
+          </StaggerItem>
         ))}
-      </div>
+      </Stagger>
 
-      <div className="grid gap-5 lg:grid-cols-12">
+      <ScrollReveal className="grid gap-5 lg:grid-cols-12">
         <Panel className="lg:col-span-8">
           <PanelHeader title="Daily gross profit" sub={`${fmtMonth(month)} · revenue vs gross profit, excl. GST`} />
           <LineChart labels={series.map((d) => fmtDay(d.date))} series={[{ name: 'Revenue', color: '#ff8a00', values: series.map((d) => d.revenue), area: true }, { name: 'Gross profit', color: '#171717', values: series.map((d) => d.profit) }]} format={moneyShort} label={`Daily revenue and profit for ${fmtMonth(month)}`} />
@@ -92,9 +94,10 @@ export default function Profit() {
             <ShareBars items={[...byCat.entries()].sort((a, b) => b[1] - a[1]).map(([l, v]) => ({ label: l, value: v }))} format={money0} />
           </Panel>
         </div>
-      </div>
+      </ScrollReveal>
 
-      <Panel className="p-3 sm:p-4">
+      <ScrollReveal>
+        <Panel className="p-3 sm:p-4">
         <PanelHeader title="Product profit analytics" sub="Unit economics use current prices; totals use realised sales in the month" className="px-2" />
         <div className="-mx-1 overflow-x-auto">
           <table className="table-base min-w-[900px]">
@@ -118,7 +121,8 @@ export default function Profit() {
             </tfoot>
           </table>
         </div>
-      </Panel>
+        </Panel>
+      </ScrollReveal>
     </div>
   );
 }

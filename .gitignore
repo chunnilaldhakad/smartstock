@@ -2,7 +2,10 @@ node_modules
 dist
 .env
 .env.local
+.env.*.local
 *.log
 supabase/.branches
 supabase/.temp
 coverage
+.vercel
+*.tsbuildinfo

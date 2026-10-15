@@ -2,7 +2,7 @@ import { ArrowRight, Flame, Gauge, Info, Lightbulb, MoveRight, Percent, RefreshC
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ProductThumb } from '@/components/brand/ProductVisual';
-import { Badge, ButtonLink, cn, Panel, PanelHeader, Segmented } from '@/components/ui';
+import { Badge, ButtonLink, cn, Panel, PanelHeader, Segmented, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { productViews, recommendations, type Recommendation } from '@/data/derived';
 import { useAppData } from '@/data/store';
@@ -38,46 +38,52 @@ export default function Insights() {
         sub="Explainable forecasts from your own sales history — no black box, no chatbot. Every number is an estimate with its formula shown."
       />
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <Stagger staggerMs={50} className="grid gap-4 md:grid-cols-4">
         {[
           { icon: <Flame size={17} />, l: 'Fast-moving products', v: fast.length, to: '#demand' },
           { icon: <Snail size={17} />, l: 'Slow-moving products', v: slow.length, to: '#demand' },
           { icon: <Gauge size={17} />, l: 'Predicted stock-outs (7 days)', v: stockouts.length, to: '#demand' },
           { icon: <Percent size={17} />, l: 'Batches at expiry risk', v: risky.length, to: '#risk' },
-        ].map((k) => (
-          <a key={k.l} href={k.to} className="panel focus-ring flex items-center gap-3 p-4 transition hover:-translate-y-0.5">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-brand-ink">{k.icon}</span>
-            <span><span className="num block text-2xl font-light">{k.v}</span><span className="text-xs text-ink-2">{k.l}</span></span>
-          </a>
+        ].map((k, idx) => (
+          <StaggerItem key={k.l} index={idx}>
+            <a href={k.to} className="panel focus-ring tap-feedback flex w-full items-center gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-lift">
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-brand-ink">{k.icon}</span>
+              <span><span className="num block text-2xl font-light">{k.v}</span><span className="text-xs text-ink-2">{k.l}</span></span>
+            </a>
+          </StaggerItem>
         ))}
-      </div>
+      </Stagger>
 
       {/* recommendations */}
-      <Panel>
-        <PanelHeader title="Recommended actions" sub="Simple rules applied to live stock, expiry and sales speed" action={<Segmented label="Filter recommendations" value={kind} onChange={setKind} options={[{ value: 'all', label: 'All' }, ...kinds.map((k) => ({ value: k, label: REC_LABEL[k] }))]} className="hidden md:inline-flex" />} />
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {recs.filter((r) => kind === 'all' || r.kind === kind).slice(0, 12).map((r) => {
-            const p = s.products.find((x) => x.id === r.productId)!;
-            return (
-              <Link key={r.id} to={r.to} className="focus-ring group flex flex-col rounded-[20px] bg-white/55 p-4 ring-1 ring-black/[.03] transition hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-glass">
-                <div className="flex items-center gap-2 text-xs font-medium text-brand-ink">
-                  <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-soft">{REC_ICON[r.kind]}</span>
-                  {REC_LABEL[r.kind]}
-                  {r.value ? <span className="num ml-auto text-ink-2">{money0(r.value)} at stake</span> : null}
-                </div>
-                <div className="mt-3 flex items-start gap-3">
-                  <ProductThumb visual={p.visual} brand={p.brand} />
-                  <div className="min-w-0">
-                    <div className="font-medium">{r.title}</div>
-                    <p className="mt-0.5 text-xs text-ink-2">{r.why}</p>
-                  </div>
-                </div>
-                <span className="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-medium">{r.action} <ArrowRight size={14} className="transition group-hover:translate-x-0.5" /></span>
-              </Link>
-            );
-          })}
-        </div>
-      </Panel>
+      <ScrollReveal>
+        <Panel>
+          <PanelHeader title="Recommended actions" sub="Simple rules applied to live stock, expiry and sales speed" action={<Segmented label="Filter recommendations" value={kind} onChange={setKind} options={[{ value: 'all', label: 'All' }, ...kinds.map((k) => ({ value: k, label: REC_LABEL[k] }))]} className="hidden md:inline-flex" />} />
+          <Stagger staggerMs={35} className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {recs.filter((r) => kind === 'all' || r.kind === kind).slice(0, 12).map((r, idx) => {
+              const p = s.products.find((x) => x.id === r.productId)!;
+              return (
+                <StaggerItem key={r.id} index={idx}>
+                  <Link to={r.to} className="focus-ring tap-feedback group flex h-full flex-col rounded-[20px] bg-white/55 p-4 ring-1 ring-black/[.03] transition hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-glass">
+                    <div className="flex items-center gap-2 text-xs font-medium text-brand-ink">
+                      <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-soft">{REC_ICON[r.kind]}</span>
+                      {REC_LABEL[r.kind]}
+                      {r.value ? <span className="num ml-auto text-ink-2">{money0(r.value)} at stake</span> : null}
+                    </div>
+                    <div className="mt-3 flex items-start gap-3">
+                      <ProductThumb visual={p.visual} brand={p.brand} />
+                      <div className="min-w-0">
+                        <div className="font-medium">{r.title}</div>
+                        <p className="mt-0.5 text-xs text-ink-2">{r.why}</p>
+                      </div>
+                    </div>
+                    <span className="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-medium">{r.action} <ArrowRight size={14} className="transition group-hover:translate-x-0.5" /></span>
+                  </Link>
+                </StaggerItem>
+              );
+            })}
+          </Stagger>
+        </Panel>
+      </ScrollReveal>
 
       <Segmented label="Insight view" value={tab} onChange={setTab} options={[{ value: 'demand', label: 'Sales prediction' }, { value: 'risk', label: 'Expiry risk' }]} />
 

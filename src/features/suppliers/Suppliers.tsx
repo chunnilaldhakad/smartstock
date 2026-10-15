@@ -2,7 +2,7 @@ import { Mail, Phone, Plus, Truck } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Badge, Button, Dialog, Field, Input, Panel, Stat } from '@/components/ui';
+import { Badge, Button, Dialog, Field, Input, Panel, Stat, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { productViews, supplierBalances } from '@/data/derived';
 import { uid } from '@/data/engine';
@@ -24,19 +24,20 @@ export default function Suppliers() {
         sub="Balances come from the supplier ledger: purchases add, payments and confirmed returns reduce."
         actions={<>{s.role !== 'cashier' && <Button variant="primary" onClick={() => setAdd(true)}><Plus size={15} />Add supplier</Button>}</>}
       />
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Panel className="p-4"><Stat label="Suppliers" value={s.suppliers.length} /></Panel>
-        <Panel className="p-4"><Stat label="You owe in total" value={money0(total)} /></Panel>
-        <Panel className="p-4"><Stat label="Open purchase orders" value={s.orders.filter((o) => o.status === 'draft' || o.status === 'ordered').length} /></Panel>
-        <Panel className="p-4"><Stat label="Pending returns" value={s.rescues.filter((r) => r.type === 'supplier_return' && r.status === 'requested').length} /></Panel>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {bal.map(({ supplier: x, balance }) => {
+      <Stagger staggerMs={40} className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StaggerItem index={0}><Panel className="p-4"><Stat label="Suppliers" value={s.suppliers.length} /></Panel></StaggerItem>
+        <StaggerItem index={1}><Panel className="p-4"><Stat label="You owe in total" value={money0(total)} /></Panel></StaggerItem>
+        <StaggerItem index={2}><Panel className="p-4"><Stat label="Open purchase orders" value={s.orders.filter((o) => o.status === 'draft' || o.status === 'ordered').length} /></Panel></StaggerItem>
+        <StaggerItem index={3}><Panel className="p-4"><Stat label="Pending returns" value={s.rescues.filter((r) => r.type === 'supplier_return' && r.status === 'requested').length} /></Panel></StaggerItem>
+      </Stagger>
+      <Stagger staggerMs={40} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {bal.map(({ supplier: x, balance }, idx) => {
           const products = views.filter((v) => v.product.supplierId === x.id);
           const last = s.purchases.filter((p) => p.supplierId === x.id).sort((a, b) => b.date.localeCompare(a.date))[0];
           const needs = products.filter((v) => v.reorder.needed).length;
           return (
-            <Link key={x.id} to={`/suppliers/${x.id}`} className="panel focus-ring group p-5 transition hover:-translate-y-0.5 hover:shadow-lift">
+            <StaggerItem key={x.id} index={idx}>
+              <Link to={`/suppliers/${x.id}`} className="panel focus-ring tap-feedback group block h-full p-5 transition hover:-translate-y-0.5 hover:shadow-lift">
               <div className="flex items-start justify-between gap-3">
                 <span className="grid h-11 w-11 place-items-center rounded-[14px] bg-white/80 text-ink-2"><Truck size={19} /></span>
                 {needs > 0 && <Badge tone="warn">{needs} to reorder</Badge>}
@@ -54,10 +55,11 @@ export default function Suppliers() {
                 </div>
                 <div className="text-right text-xs text-ink-2">{products.length} products<br />{last ? `Last bill ${fmtDate(last.date)}` : 'No purchases yet'}</div>
               </div>
-            </Link>
+              </Link>
+            </StaggerItem>
           );
         })}
-      </div>
+      </Stagger>
       <AddSupplier open={add} onOpenChange={setAdd} />
     </div>
   );

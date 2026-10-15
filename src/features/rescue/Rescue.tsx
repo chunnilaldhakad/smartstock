@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ProductThumb, ProductVisual } from '@/components/brand/ProductVisual';
 import { ShareBars } from '@/components/charts';
-import { Badge, Button, Dialog, Empty, Field, Input, Panel, PanelHeader, Select } from '@/components/ui';
+import { Badge, Button, Dialog, Empty, Field, Input, Panel, PanelHeader, Select, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { productViews, rescueStats, stockAtRisk } from '@/data/derived';
 import { approveDiscount, closeRescue, confirmRescue } from '@/data/engine';
@@ -60,7 +60,7 @@ export default function Rescue() {
     <div className="space-y-6">
       <PageHeader eyebrow="Stock rescue" title="Recover money from unsold stock" sub="Return, resell, discount or donate stock before it becomes waste. Requests and confirmed outcomes are tracked separately; expired stock is never offered for sale." />
 
-      <div className="grid gap-5 lg:grid-cols-12">
+      <ScrollReveal className="grid gap-5 lg:grid-cols-12">
         <Panel className="lg:col-span-5">
           <PanelHeader title="Stock saved" sub={`${fmtMonth(month)} · confirmed outcomes only`} />
           <div className="num text-[44px] font-extralight tracking-tight">{money0(stats.total)}</div>
@@ -78,30 +78,34 @@ export default function Rescue() {
           </div>
           <div className="mt-5"><ShareBars items={risk.byCat.map(([l, v]) => ({ label: l, value: v }))} format={money0} /></div>
         </Panel>
-      </div>
+      </ScrollReveal>
 
-      <Panel>
+      <ScrollReveal>
+        <Panel>
         <PanelHeader title="Rescue candidates" sub="Near-expiry, expired and slow-moving batches without an open rescue" />
         {candidates.length === 0 ? (
           <Empty icon={<LifeBuoy size={20} />} title="Nothing to rescue">Every at-risk batch already has a rescue in progress.</Empty>
         ) : (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {candidates.map(({ v, b }) => (
-              <div key={b.batch.id} className="flex gap-3 rounded-[20px] bg-white/55 p-4 ring-1 ring-black/[.03]">
-                <ProductVisual visual={v.product.visual} brand={v.product.brand} className="h-20 w-14 shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <Link to={`/products/${v.product.id}`} className="block truncate font-medium hover:underline">{v.product.name}</Link>
-                  <p className="text-xs text-ink-2">{b.batch.internal ? 'Lot' : b.batch.code} · {qty(b.qty)} units · {b.daysLeft !== null ? relDays(b.daysLeft) : 'no expiry'}</p>
-                  <p className="mt-1 text-xs">{b.status === 'expired' ? <span className="text-bad">Expired — return or write off only</span> : (b.risk?.unsold ?? 0) > 0 ? <span className="text-warn">~{Math.round(b.risk!.unsold)} may stay unsold · {money0(b.risk!.unsold * b.batch.unitCost)}</span> : <span className="text-ink-2">Slow-moving · {v.velocity.perDay.toFixed(1)}/day</span>}</p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    <Button size="sm" variant="primary" onClick={() => setDlg({ batchId: b.batch.id, type: b.status === 'expired' ? 'supplier_return' : undefined })} disabled={s.role === 'cashier'}>Rescue</Button>
+          <Stagger staggerMs={35} className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {candidates.map(({ v, b }, idx) => (
+              <StaggerItem key={b.batch.id} index={idx}>
+                <div className="flex h-full gap-3 rounded-[20px] bg-white/55 p-4 ring-1 ring-black/[.03] transition hover:-translate-y-0.5 hover:shadow-glass">
+                  <ProductVisual visual={v.product.visual} brand={v.product.brand} className="h-20 w-14 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Link to={`/products/${v.product.id}`} className="block truncate font-medium hover:underline">{v.product.name}</Link>
+                    <p className="text-xs text-ink-2">{b.batch.internal ? 'Lot' : b.batch.code} · {qty(b.qty)} units · {b.daysLeft !== null ? relDays(b.daysLeft) : 'no expiry'}</p>
+                    <p className="mt-1 text-xs">{b.status === 'expired' ? <span className="text-bad">Expired — return or write off only</span> : (b.risk?.unsold ?? 0) > 0 ? <span className="text-warn">~{Math.round(b.risk!.unsold)} may stay unsold · {money0(b.risk!.unsold * b.batch.unitCost)}</span> : <span className="text-ink-2">Slow-moving · {v.velocity.perDay.toFixed(1)}/day</span>}</p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      <Button size="sm" variant="primary" onClick={() => setDlg({ batchId: b.batch.id, type: b.status === 'expired' ? 'supplier_return' : undefined })} disabled={s.role === 'cashier'}>Rescue</Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         )}
       </Panel>
+    </ScrollReveal>
 
       <Panel className="p-3 sm:p-5">
         <PanelHeader title="In progress" sub="Requests waiting for approval or confirmation" className="px-1" />

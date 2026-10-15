@@ -40,7 +40,7 @@ export default function Welcome() {
         </div>
       </section>
       <section className="relative z-[1] flex items-center justify-center p-5 sm:p-10">
-        <div className="w-full max-w-md">
+        <div className="animate-reveal-up w-full max-w-md">
           <Logo className="mb-10" />
           <h1 className="text-[40px] font-extralight leading-[1.05] tracking-[-0.02em]">{mode === 'signin' ? 'Welcome back' : 'Run your shop smarter'}</h1>
           <p className="mt-2 text-ink-2">Billing, stock, expiry and profit for Indian retailers — in one calm place.</p>

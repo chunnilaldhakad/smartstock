@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { activeAlerts } from '@/data/derived';
 import { dispatch, resetDemo, useAppData, useSelect } from '@/data/store';
 import type { Role } from '@/data/types';
-import { ButtonLink, cn, Menu } from '@/components/ui';
+import { ButtonLink, cn, Menu, PageTransition } from '@/components/ui';
 import { GlobalSearch } from './GlobalSearch';
 import { ScannerDialog } from '@/features/scanner/ScannerDialog';
 
@@ -237,10 +237,12 @@ export function AppShell() {
       </a>
       <TopNav onSearch={() => setSearch(true)} onScan={() => setScan(true)} />
       <main id="main" className="relative z-[1] mx-auto max-w-[1400px] px-4 pb-28 pt-6 sm:px-6 lg:px-8">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       {loc.pathname !== '/pos' && (
-        <Link to="/pos" className="no-print focus-ring fixed bottom-5 right-5 z-30 flex h-14 items-center gap-2 rounded-full bg-brand px-5 font-semibold text-ink shadow-[0_14px_30px_-10px_rgba(255,138,0,.8)] sm:hidden" aria-label="New bill">
+        <Link to="/pos" className="no-print focus-ring tap-feedback fixed bottom-5 right-5 z-30 flex h-14 items-center gap-2 rounded-full bg-brand px-5 font-semibold text-ink shadow-[0_14px_30px_-10px_rgba(255,138,0,.8)] transition hover:scale-105 active:scale-95 sm:hidden" aria-label="New bill">
           <ShoppingCart size={19} /> New bill
         </Link>
       )}

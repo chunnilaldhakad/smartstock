@@ -53,7 +53,7 @@ export default function Onboarding() {
   return (
     <div className="relative grid min-h-dvh place-items-center p-4">
       <div className="atmosphere" aria-hidden><i /><i /><i /></div>
-      <div className="relative z-[1] w-full max-w-2xl">
+      <div className="animate-reveal-up relative z-[1] w-full max-w-2xl">
         <Logo className="mb-8" />
         <ol className="mb-6 flex gap-2" aria-label="Progress">
           {STEPS.map((s, i) => (

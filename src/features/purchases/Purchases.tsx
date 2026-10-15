@@ -2,7 +2,7 @@ import { ClipboardList, PackageCheck, Plus, Send, Sparkles, X } from 'lucide-rea
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Badge, Button, ButtonLink, Empty, Panel, Stat, TabPanel, Tabs } from '@/components/ui';
+import { Badge, Button, ButtonLink, Empty, Panel, Stat, TabPanel, Tabs, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { productViews } from '@/data/derived';
 import { purchaseDue, uid } from '@/data/engine';
@@ -50,13 +50,14 @@ export default function Purchases() {
           </>
         }
       />
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Panel className="p-4"><Stat label="Purchases this month" value={money0(s.purchases.filter((p) => p.date.startsWith(month)).reduce((a, p) => a + p.total, 0))} /></Panel>
-        <Panel className="p-4"><Stat label="Bills with dues" value={s.purchases.filter((p) => purchaseDue(p) > 0).length} /></Panel>
-        <Panel className="p-4"><Stat label="Draft orders" value={s.orders.filter((o) => o.status === 'draft').length} /></Panel>
-        <Panel className="p-4"><Stat label="Awaiting delivery" value={s.orders.filter((o) => o.status === 'ordered').length} /></Panel>
-      </div>
-      <Panel className="p-2 sm:p-4">
+      <Stagger staggerMs={40} className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StaggerItem index={0}><Panel className="p-4"><Stat label="Purchases this month" value={money0(s.purchases.filter((p) => p.date.startsWith(month)).reduce((a, p) => a + p.total, 0))} /></Panel></StaggerItem>
+        <StaggerItem index={1}><Panel className="p-4"><Stat label="Bills with dues" value={s.purchases.filter((p) => purchaseDue(p) > 0).length} /></Panel></StaggerItem>
+        <StaggerItem index={2}><Panel className="p-4"><Stat label="Draft orders" value={s.orders.filter((o) => o.status === 'draft').length} /></Panel></StaggerItem>
+        <StaggerItem index={3}><Panel className="p-4"><Stat label="Awaiting delivery" value={s.orders.filter((o) => o.status === 'ordered').length} /></Panel></StaggerItem>
+      </Stagger>
+      <ScrollReveal>
+        <Panel className="p-2 sm:p-4">
         <Tabs value={tab} onValueChange={(v) => { params.set('tab', v); setParams(params, { replace: true }); }} tabs={[{ value: 'bills', label: 'Purchase bills' }, { value: 'orders', label: 'Purchase orders' }]}>
           <TabPanel value="bills">
             <div className="-mx-1 overflow-x-auto">
@@ -118,7 +119,8 @@ export default function Purchases() {
             )}
           </TabPanel>
         </Tabs>
-      </Panel>
+        </Panel>
+      </ScrollReveal>
     </div>
   );
 }

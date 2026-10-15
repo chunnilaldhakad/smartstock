@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { StoreBackdrop } from '@/components/brand/IsometricStore';
 import { ProductThumb } from '@/components/brand/ProductVisual';
 import { CapsuleSpark, FineBars, LineChart, SemiGauge } from '@/components/charts';
-import { Badge, ButtonLink, cn, DemoTag, Panel, PanelHeader, Select } from '@/components/ui';
+import { Badge, ButtonLink, cn, DemoTag, Panel, PanelHeader, Select, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import {
   activeAlerts, dailySeries, locationLabel, periodSales, productViews, rescueStats, stockAtRisk,
 } from '@/data/derived';
@@ -104,40 +104,48 @@ export default function Dashboard() {
                 <CalendarDays size={13} /> {fmtWeekday(today)}, {fmtDate(today)} · <DemoTag />
               </p>
             </div>
-            <div className="mt-auto grid grid-cols-2 gap-3 pt-8 md:grid-cols-1">
-              <MiniCard title="Total Products" to="/inventory" className="animate-rise [animation-delay:80ms]">
-                <div className="mt-3 flex items-end justify-between">
-                  <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand-soft text-brand-ink"><ShoppingCart size={15} /></span>
-                  <div className="text-right">
-                    <div className="num text-lg font-medium">{qty(s.products.filter((p) => p.status === 'active').length)}</div>
-                    <div className="text-[11px] text-ink-2">Active products</div>
+            <Stagger staggerMs={70} className="mt-auto grid grid-cols-2 gap-3 pt-8 md:grid-cols-1">
+              <StaggerItem index={0}>
+                <MiniCard title="Total Products" to="/inventory">
+                  <div className="mt-3 flex items-end justify-between">
+                    <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand-soft text-brand-ink"><ShoppingCart size={15} /></span>
+                    <div className="text-right">
+                      <div className="num text-lg font-medium">{qty(s.products.filter((p) => p.status === 'active').length)}</div>
+                      <div className="text-[11px] text-ink-2">Active products</div>
+                    </div>
                   </div>
-                </div>
-              </MiniCard>
-              <MiniCard title="Stock at Risk" to="/rescue" className="animate-rise [animation-delay:140ms]">
-                <div className="mt-3 flex items-end justify-between">
-                  <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand-soft text-brand-ink"><PackageX size={15} /></span>
-                  <div className="text-right">
-                    <div className="num text-lg font-medium">{money0(risk.total)}</div>
-                    <div className="text-[11px] text-ink-2">Cost exposure, near expiry</div>
+                </MiniCard>
+              </StaggerItem>
+              <StaggerItem index={1}>
+                <MiniCard title="Stock at Risk" to="/rescue">
+                  <div className="mt-3 flex items-end justify-between">
+                    <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand-soft text-brand-ink"><PackageX size={15} /></span>
+                    <div className="text-right">
+                      <div className="num text-lg font-medium">{money0(risk.total)}</div>
+                      <div className="text-[11px] text-ink-2">Cost exposure, near expiry</div>
+                    </div>
                   </div>
-                </div>
-              </MiniCard>
-            </div>
+                </MiniCard>
+              </StaggerItem>
+            </Stagger>
           </div>
           <div className="hidden md:block" />
           <div className="flex flex-col gap-3">
-            <MiniCard title="Monthly Revenue" to="/profit" className="animate-rise [animation-delay:200ms]">
-              <CapsuleSpark values={revenueSpark} className="mt-3 h-10 w-full" />
-              <div className="num mt-3 text-xl font-medium">{money0(mtd.total)}</div>
-              <div className="text-[11px] text-ink-2">{fmtMonth(month)} to date · incl. GST</div>
-            </MiniCard>
+            <Stagger staggerMs={70} initialDelayMs={140}>
+              <StaggerItem index={0}>
+                <MiniCard title="Monthly Revenue" to="/profit">
+                  <CapsuleSpark values={revenueSpark} className="mt-3 h-10 w-full" />
+                  <div className="num mt-3 text-xl font-medium">{money0(mtd.total)}</div>
+                  <div className="text-[11px] text-ink-2">{fmtMonth(month)} to date · incl. GST</div>
+                </MiniCard>
+              </StaggerItem>
+            </Stagger>
           </div>
         </div>
       </section>
 
       {/* ───────── First row ───────── */}
-      <section className="grid grid-cols-1 gap-5 lg:grid-cols-12" aria-label="Key metrics">
+      <ScrollReveal as="section" className="grid grid-cols-1 gap-5 lg:grid-cols-12" aria-label="Key metrics">
         <Panel className="lg:col-span-5">
           <PanelHeader title="Weekly Sales" sub="Last 7 days, by hour of trading" action={<Link to="/sales" className="link text-xs">History <ArrowRight size={13} /></Link>} />
           <div className="num text-[28px] font-light tracking-tight">{money0(week.total)}</div>
@@ -188,21 +196,27 @@ export default function Dashboard() {
             ))}
           </ul>
         </Panel>
-      </section>
+      </ScrollReveal>
 
       {/* ───────── Today's priorities ───────── */}
-      <section aria-labelledby="prio">
+      <ScrollReveal as="section" aria-labelledby="prio">
         <h2 id="prio" className="h-section">Today’s priorities</h2>
         <p className="mb-4 mt-1 text-sm text-ink-2">Clear risks before they become losses.</p>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Priority icon={<Clock3 size={18} />} label="Expiring soon" value={`${expiringBatches.length} batches`} sub={`Expiring within ${s.business.expiryWarningDays} days`} to="/alerts?kind=expiring" action="Review batches" />
-          <Priority icon={<PackageX size={18} />} label="Low stock" value={`${lowCount} products`} sub="At or below minimum level" to="/inventory?filter=low" action="Create reorder" />
-          <Priority icon={<ShoppingCart size={18} />} label="Shelf refill" value={`${refill.length} products`} sub="Shelf below minimum, backroom has stock" to="/alerts?kind=refill" action="Move stock" />
-        </div>
-      </section>
+        <Stagger staggerMs={60} className="grid gap-4 md:grid-cols-3">
+          <StaggerItem index={0}>
+            <Priority icon={<Clock3 size={18} />} label="Expiring soon" value={`${expiringBatches.length} batches`} sub={`Expiring within ${s.business.expiryWarningDays} days`} to="/alerts?kind=expiring" action="Review batches" />
+          </StaggerItem>
+          <StaggerItem index={1}>
+            <Priority icon={<PackageX size={18} />} label="Low stock" value={`${lowCount} products`} sub="At or below minimum level" to="/inventory?filter=low" action="Create reorder" />
+          </StaggerItem>
+          <StaggerItem index={2}>
+            <Priority icon={<ShoppingCart size={18} />} label="Shelf refill" value={`${refill.length} products`} sub="Shelf below minimum, backroom has stock" to="/alerts?kind=refill" action="Move stock" />
+          </StaggerItem>
+        </Stagger>
+      </ScrollReveal>
 
       {/* ───────── Expiry watchlist + Reorder ───────── */}
-      <section className="grid gap-5 lg:grid-cols-12">
+      <ScrollReveal as="section" className="grid gap-5 lg:grid-cols-12">
         <Panel className="lg:col-span-7">
           <PanelHeader title="Expiry watchlist" sub="Earliest expiry first. Forecast unsold uses current sales speed (FEFO)." action={<Link to="/alerts?kind=expiring" className="link text-xs">View all <ArrowRight size={13} /></Link>} />
           <div className="-mx-2 overflow-x-auto">
@@ -270,7 +284,7 @@ export default function Dashboard() {
             </table>
           </div>
         </Panel>
-      </section>
+      </ScrollReveal>
 
       <Performance />
 
@@ -324,7 +338,7 @@ function Performance() {
   const topDemand = [...views].filter((v) => v.velocity.sufficient).sort((a, b) => b.forecastTotal * b.product.price - a.forecastTotal * a.product.price).slice(0, 3);
 
   return (
-    <section aria-labelledby="perf" className="space-y-4">
+    <ScrollReveal as="section" aria-labelledby="perf" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h2 id="perf" className="h-section">Performance &amp; demand</h2>
         <label className="flex items-center gap-2 text-xs text-ink-2">
@@ -393,7 +407,7 @@ function Performance() {
           </ul>
         </Panel>
       </div>
-    </section>
+    </ScrollReveal>
   );
 }
 
@@ -407,7 +421,7 @@ function RescueAndProfit() {
   const views = productViews(s);
   const ranked = [...p.byProduct.entries()].map(([id, x]) => ({ v: views.find((y) => y.product.id === id)!, profit: x.revenue - x.cost, margin: x.revenue ? ((x.revenue - x.cost) / x.revenue) * 100 : 0 })).sort((a, b) => b.profit - a.profit).slice(0, 4);
   return (
-    <section className="grid gap-5 lg:grid-cols-12">
+    <ScrollReveal as="section" className="grid gap-5 lg:grid-cols-12">
       <Panel className="lg:col-span-6">
         <PanelHeader title="Sales rescue" sub="Recovered from at-risk stock this month — each unit counted once" action={<Link to="/rescue" className="text-ink-3 hover:text-ink" aria-label="Open stock rescue"><ArrowUpRight size={15} /></Link>} />
         <div className="flex items-end justify-between gap-4">
@@ -450,7 +464,7 @@ function RescueAndProfit() {
           </tbody>
         </table>
       </Panel>
-    </section>
+    </ScrollReveal>
   );
 }
 
@@ -471,8 +485,9 @@ function RecentActivity() {
     });
   }, [s]);
   return (
-    <Panel>
-      <PanelHeader title="Recent stock activity" action={<Link to="/inventory/activity" className="link text-xs">View all activity <ArrowRight size={13} /></Link>} />
+    <ScrollReveal>
+      <Panel>
+        <PanelHeader title="Recent stock activity" action={<Link to="/inventory/activity" className="link text-xs">View all activity <ArrowRight size={13} /></Link>} />
       <div className="-mx-2 overflow-x-auto">
         <table className="table-base min-w-[640px]">
           <thead><tr><th>When</th><th>Product</th><th>Activity</th><th className="text-right">Quantity</th><th>Location</th></tr></thead>
@@ -491,5 +506,6 @@ function RecentActivity() {
       </div>
       <p className="mt-3 text-[11px] text-ink-3">Transfers move stock between locations; total business stock is unchanged.</p>
     </Panel>
+  </ScrollReveal>
   );
 }

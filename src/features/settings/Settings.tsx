@@ -1,7 +1,7 @@
 import { Database, RotateCcw, ShieldCheck, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Badge, Button, Field, Input, Panel, PanelHeader, Select } from '@/components/ui';
+import { Badge, Button, Field, Input, Panel, PanelHeader, Select, ScrollReveal } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { dispatch, resetDemo, useAppData } from '@/data/store';
 import type { Business, Role } from '@/data/types';
@@ -33,7 +33,7 @@ export default function Settings() {
   return (
     <div className="space-y-6">
       <PageHeader eyebrow="Settings" title="Business settings" sub={owner ? 'Changes apply to new bills only. Past invoices are never rewritten.' : 'Only the owner can change settings. You can view them.'} actions={owner ? <Button variant="primary" onClick={save}>Save changes</Button> : <Badge>Read only</Badge>} />
-      <div className="grid gap-5 lg:grid-cols-2">
+      <ScrollReveal className="grid gap-5 lg:grid-cols-2">
         <Panel>
           <PanelHeader title="Business" />
           <fieldset disabled={!owner} className="grid gap-4 sm:grid-cols-2">
@@ -75,34 +75,36 @@ export default function Settings() {
             ))}
           </ul>
         </Panel>
-      </div>
+      </ScrollReveal>
 
-      <Panel id="about">
-        <PanelHeader title="What is real vs demo" action={<ShieldCheck size={18} className="text-ink-2" />} />
-        <div className="grid gap-4 text-sm text-ink-2 md:grid-cols-2">
-          <div>
-            <p className="font-medium text-ink">Working in this preview</p>
-            <ul className="mt-1 list-disc space-y-1 pl-5">
-              <li>Billing with FEFO batch allocation, GST engine, split/credit payments and duplicate-click protection</li>
-              <li>Stock ledger, transfers, write-offs, purchases, voids, customer and supplier balances</li>
-              <li>Forecasts, expiry risk, reorder, alerts, stock rescue, monthly records and CSV exports</li>
-              <li>Browser printing (80 mm receipt and A4 invoice), barcode scanning via camera, USB scanner or typing</li>
-            </ul>
+      <ScrollReveal>
+        <Panel id="about">
+          <PanelHeader title="What is real vs demo" action={<ShieldCheck size={18} className="text-ink-2" />} />
+          <div className="grid gap-4 text-sm text-ink-2 md:grid-cols-2">
+            <div>
+              <p className="font-medium text-ink">Working in this preview</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
+                <li>Billing with FEFO batch allocation, GST engine, split/credit payments and duplicate-click protection</li>
+                <li>Stock ledger, transfers, write-offs, purchases, voids, customer and supplier balances</li>
+                <li>Forecasts, expiry risk, reorder, alerts, stock rescue, monthly records and CSV exports</li>
+                <li>Browser printing (80 mm receipt and A4 invoice), barcode scanning via camera, USB scanner or typing</li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-medium text-ink">Not connected yet</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
+                <li>This preview stores data in this browser only (demo store, {s.business.name}). The Supabase database, sign-in and row-level security are prepared in <code>supabase/migrations</code> but not wired to this UI.</li>
+                <li>No UPI/card processing, GST filing, GSTIN verification, marketplace or silent printer integration.</li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <p className="font-medium text-ink">Not connected yet</p>
-            <ul className="mt-1 list-disc space-y-1 pl-5">
-              <li>This preview stores data in this browser only (demo store, {s.business.name}). The Supabase database, sign-in and row-level security are prepared in <code>supabase/migrations</code> but not wired to this UI.</li>
-              <li>No UPI/card processing, GST filing, GSTIN verification, marketplace or silent printer integration.</li>
-            </ul>
+          <div className="mt-5 flex flex-wrap items-center gap-3 border-t pt-4 hairline">
+            <Database size={16} className="text-ink-2" />
+            <span className="text-sm text-ink-2">Demo records are separate from real business data and can be rebuilt at any time.</span>
+            <Button className="ml-auto" disabled={!owner} onClick={() => { resetDemo(); toast('Demo store rebuilt'); }}><RotateCcw size={15} />Reset demo data</Button>
           </div>
-        </div>
-        <div className="mt-5 flex flex-wrap items-center gap-3 border-t pt-4 hairline">
-          <Database size={16} className="text-ink-2" />
-          <span className="text-sm text-ink-2">Demo records are separate from real business data and can be rebuilt at any time.</span>
-          <Button className="ml-auto" disabled={!owner} onClick={() => { resetDemo(); toast('Demo store rebuilt'); }}><RotateCcw size={15} />Reset demo data</Button>
-        </div>
-      </Panel>
+        </Panel>
+      </ScrollReveal>
     </div>
   );
 }

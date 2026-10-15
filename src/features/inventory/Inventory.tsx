@@ -2,7 +2,7 @@ import { ArrowDownUp, Download, FileUp, History, LayoutGrid, List, Plus, ScanLin
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductThumb, ProductVisual } from '@/components/brand/ProductVisual';
-import { Badge, Button, ButtonLink, cn, Empty, Input, Panel, Segmented, Select, Stat } from '@/components/ui';
+import { Badge, Button, ButtonLink, cn, Empty, Input, Panel, Segmented, Select, Stat, ScrollReveal, Stagger, StaggerItem } from '@/components/ui';
 import { PageHeader } from '@/components/layout/AppShell';
 import { locationLabel, productViews, stockAtRisk, type ProductView } from '@/data/derived';
 import { useAppData } from '@/data/store';
@@ -109,7 +109,7 @@ export default function Inventory() {
         }
       />
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <Stagger staggerMs={40} className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {[
           ['Active products', qty(totals.active), 'all'],
           ['Low stock', qty(totals.low), 'low'],
@@ -117,14 +117,17 @@ export default function Inventory() {
           ['Stock value (at cost)', money0(totals.value), 'all'],
           ['Batches expiring', qty(totals.expiring), 'expiring'],
           ['Expired units on hand', qty(totals.expired), 'expired'],
-        ].map(([l, v, f]) => (
-          <button key={l} onClick={() => setFilter(f as Filter)} className={cn('panel focus-ring p-4 text-left transition hover:-translate-y-0.5', filter === f && f !== 'all' && 'ring-2 ring-brand/40')}>
-            <Stat label={l} value={v} />
-          </button>
+        ].map(([l, v, f], idx) => (
+          <StaggerItem key={l} index={idx}>
+            <button onClick={() => setFilter(f as Filter)} className={cn('panel focus-ring tap-feedback w-full p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lift', filter === f && f !== 'all' && 'ring-2 ring-brand/40')}>
+              <Stat label={l} value={v} />
+            </button>
+          </StaggerItem>
         ))}
-      </div>
+      </Stagger>
 
-      <Panel className="p-3 sm:p-4">
+      <ScrollReveal>
+        <Panel className="p-3 sm:p-4">
         <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center">
           <div className="relative flex-1">
             <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
@@ -198,7 +201,8 @@ export default function Inventory() {
             <Button size="sm" variant="ghost" disabled={page >= pages - 1} onClick={() => setPage((p) => p + 1)}>Next</Button>
           </div>
         </div>
-      </Panel>
+        </Panel>
+      </ScrollReveal>
 
       <ProductFormDialog
         open={form.open}
